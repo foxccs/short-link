@@ -49,7 +49,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import LoadingSpinner from '@/components/base/LoadingSpinner.vue';
-import { showError, showMessage } from '@/utils/message.js';
+import { Message } from '@arco-design/web-vue';
 
 // 响应式状态
 const username = ref('');
@@ -62,7 +62,7 @@ const router = useRouter();
 // 处理登录
 async function handleLogin() {
   if (!username.value || !password.value) {
-    showError('请输入用户名和密码');
+    Message.error('请输入用户名和密码');
     return;
   }
 
@@ -75,20 +75,20 @@ async function handleLogin() {
     // 模拟登录延迟
     await new Promise((resolve) => setTimeout(resolve, 1500));
 
-    showMessage('登录功能即将上线', 'info');
+    Message.info('登录功能即将上线');
     isLoading.value = false;
 
     // 登录成功后重定向到统计面板
     // router.push('/dashboard');
   } catch (error) {
     isLoading.value = false;
-    showError(error.message || '登录失败，请稍后再试');
+    Message.error(error.message || '登录失败，请稍后再试');
   }
 }
 
 // 跳转到注册页面
 function goToRegister() {
-  showMessage('注册功能即将上线', 'info');
+  Message.info('注册功能即将上线');
   // 将来会实现注册页面跳转
   // router.push('/register');
 }

@@ -3,12 +3,10 @@
     <header class="dashboard-header">
       <div class="logo">短链接统计面板</div>
       <div class="user-actions">
-        <button class="user-button" @click="logout">
-          退出登录
-        </button>
+        <button class="user-button" @click="logout">退出登录</button>
       </div>
     </header>
-    
+
     <div class="dashboard-content">
       <div class="sidebar">
         <nav class="sidebar-nav">
@@ -26,45 +24,45 @@
           </a>
         </nav>
       </div>
-      
+
       <main class="main-content">
         <div class="page-header">
           <h1>链接统计</h1>
           <p>查看您的短链接使用情况</p>
         </div>
-        
+
         <div class="stats-cards">
           <div class="stats-card">
             <div class="stats-card-header">总链接数</div>
             <div class="stats-card-value">{{ stats.totalLinks }}</div>
             <div class="stats-card-trend positive">↑ 5.2%</div>
           </div>
-          
+
           <div class="stats-card">
             <div class="stats-card-header">总点击数</div>
             <div class="stats-card-value">{{ stats.totalClicks }}</div>
             <div class="stats-card-trend positive">↑ 12.7%</div>
           </div>
-          
+
           <div class="stats-card">
             <div class="stats-card-header">本周新增</div>
             <div class="stats-card-value">{{ stats.weeklyNew }}</div>
             <div class="stats-card-trend negative">↓ 2.3%</div>
           </div>
-          
+
           <div class="stats-card">
             <div class="stats-card-header">平均点击率</div>
             <div class="stats-card-value">{{ stats.avgClickRate }}%</div>
             <div class="stats-card-trend positive">↑ 3.8%</div>
           </div>
         </div>
-        
+
         <div class="recent-links">
           <div class="section-header">
             <h2>最近链接</h2>
             <button class="view-all-btn">查看全部</button>
           </div>
-          
+
           <div class="links-table-container">
             <table class="links-table">
               <thead>
@@ -78,21 +76,37 @@
               </thead>
               <tbody>
                 <tr v-for="(link, index) in recentLinks" :key="index">
-                  <td class="original-link" :title="link.originalUrl">{{ link.originalUrl }}</td>
+                  <td class="original-link" :title="link.originalUrl">
+                    {{ link.originalUrl }}
+                  </td>
                   <td>
-                    <a :href="link.shortUrl" target="_blank">{{ link.shortUrl }}</a>
+                    <a :href="link.shortUrl" target="_blank">{{
+                      link.shortUrl
+                    }}</a>
                   </td>
                   <td>{{ link.createdAt }}</td>
                   <td>{{ link.clicks }}</td>
                   <td>
                     <div class="link-actions">
-                      <button class="action-icon copy" title="复制链接" @click="copyLink(link.shortUrl)">
+                      <button
+                        class="action-icon copy"
+                        title="复制链接"
+                        @click="copyLink(link.shortUrl)"
+                      >
                         <span v-html="copyIcon"></span>
                       </button>
-                      <button class="action-icon qr" title="查看二维码" @click="showQRCode(link.shortUrl)">
+                      <button
+                        class="action-icon qr"
+                        title="查看二维码"
+                        @click="showQRCode(link.shortUrl)"
+                      >
                         <span v-html="qrcodeIcon"></span>
                       </button>
-                      <button class="action-icon stats" title="详细统计" @click="showLinkStats(link.id)">
+                      <button
+                        class="action-icon stats"
+                        title="详细统计"
+                        @click="showLinkStats(link.id)"
+                      >
                         <span v-html="chartIcon"></span>
                       </button>
                     </div>
@@ -102,7 +116,7 @@
             </table>
           </div>
         </div>
-        
+
         <div class="dashboard-footer">
           <p>统计数据更新于: {{ lastUpdated }}</p>
         </div>
@@ -113,12 +127,13 @@
 
 <script setup>
 import { ref } from 'vue';
+
 import { useRouter } from 'vue-router';
-import { showMessage } from '@/utils/message.js';
-import statsIcon from '@/assets/images/stats.svg?raw';
-import linkIcon from '@/assets/images/link.svg?raw';
+
 import copyIcon from '@/assets/images/copy.svg?raw';
+import linkIcon from '@/assets/images/link.svg?raw';
 import qrcodeIcon from '@/assets/images/qrcode.svg?raw';
+import statsIcon from '@/assets/images/stats.svg?raw';
 
 // 路由
 const router = useRouter();
@@ -132,45 +147,49 @@ const stats = ref({
   totalLinks: 42,
   totalClicks: 1284,
   weeklyNew: 8,
-  avgClickRate: 32.5
+  avgClickRate: 32.5,
 });
 
 const recentLinks = ref([
   {
     id: 1,
-    originalUrl: 'https://example.com/very/long/path/to/some/page/with/lots/of/parameters?param1=value1&param2=value2',
+    originalUrl:
+      'https://example.com/very/long/path/to/some/page/with/lots/of/parameters?param1=value1&param2=value2',
     shortUrl: 'https://s-link.com/abc123',
     createdAt: '2023-06-15 14:32',
-    clicks: 245
+    clicks: 245,
   },
   {
     id: 2,
-    originalUrl: 'https://another-example.org/blog/article/how-to-create-short-links',
+    originalUrl:
+      'https://another-example.org/blog/article/how-to-create-short-links',
     shortUrl: 'https://s-link.com/def456',
     createdAt: '2023-06-14 09:17',
-    clicks: 189
+    clicks: 189,
   },
   {
     id: 3,
     originalUrl: 'https://docs.example.com/api/reference/v2',
     shortUrl: 'https://s-link.com/ghi789',
     createdAt: '2023-06-12 16:45',
-    clicks: 127
+    clicks: 127,
   },
   {
     id: 4,
-    originalUrl: 'https://shop.example.com/products/category/electronics?sort=price-asc',
+    originalUrl:
+      'https://shop.example.com/products/category/electronics?sort=price-asc',
     shortUrl: 'https://s-link.com/jkl012',
     createdAt: '2023-06-10 11:23',
-    clicks: 98
+    clicks: 98,
   },
   {
     id: 5,
-    originalUrl: 'https://maps.example.com/directions?origin=New+York&destination=Boston',
+    originalUrl:
+      'https://maps.example.com/directions?origin=New+York&destination=Boston',
     shortUrl: 'https://s-link.com/mno345',
     createdAt: '2023-06-08 13:51',
-    clicks: 76
-  }
+    clicks: 76,
+  },
 ]);
 
 const lastUpdated = ref('2023-06-15 18:30:42');
@@ -179,26 +198,26 @@ const lastUpdated = ref('2023-06-15 18:30:42');
 async function copyLink(url) {
   try {
     await navigator.clipboard.writeText(url);
-    showMessage('链接已复制到剪贴板', 'success');
+    Message.success('链接已复制到剪贴板');
   } catch (error) {
     console.error('复制失败:', error);
-    showMessage('复制失败，请手动复制', 'error');
+    Message.error('复制失败，请手动复制');
   }
 }
 
 // 显示二维码
 function showQRCode(url) {
-  showMessage('二维码功能即将上线', 'info');
+  Message.info('二维码功能即将上线');
 }
 
 // 显示链接统计
 function showLinkStats(id) {
-  showMessage('详细统计功能即将上线', 'info');
+  Message.info('详细统计功能即将上线');
 }
 
 // 退出登录
 function logout() {
-  showMessage('退出登录功能即将上线', 'info');
+  Message.info('退出登录功能即将上线');
   // 将来会实现退出登录逻辑
   // router.push('/login');
   setTimeout(() => {
@@ -517,20 +536,20 @@ function logout() {
   .sidebar {
     width: 60px;
   }
-  
+
   .nav-item {
     padding: 12px;
     justify-content: center;
   }
-  
+
   .nav-item span:not(.nav-icon) {
     display: none;
   }
-  
+
   .stats-cards {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .original-link {
     max-width: 150px;
   }
@@ -540,11 +559,11 @@ function logout() {
   .stats-cards {
     grid-template-columns: 1fr;
   }
-  
+
   .links-table-container {
     overflow-x: auto;
   }
-  
+
   .links-table {
     min-width: 600px;
   }

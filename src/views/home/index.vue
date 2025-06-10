@@ -29,14 +29,12 @@
         :shortUrl="currentShortUrl"
         @generate-qrcode="showQRCodeModal"
         @show-stats="showStats"
-        @message="showMessage"
       />
 
       <QRCodeModal
         :visible="qrcodeModalVisible"
         :url="currentShortUrl"
         @close="closeQRCodeModal"
-        @error="showMessage"
       />
     </div>
   </div>
@@ -53,8 +51,8 @@ import UrlInput from '@/components/base/UrlInput.vue';
 import QRCodeModal from '@/components/QRCodeModal.vue';
 import ShortLinkCard from '@/components/ShortLinkCard.vue';
 import { addUrl } from '@/services/api.js';
-import { showMessage } from '@/utils/message.js';
 import { validateUrl } from '@/utils/validator.js';
+import { Message } from '@arco-design/web-vue';
 
 // 响应式状态
 const urlInput = ref('');
@@ -68,14 +66,13 @@ const qrcodeModalVisible = ref(false);
 async function generateShortLink() {
   const inputUrl = urlInput.value.trim();
   if (!inputUrl) {
-    showMessage('请输入链接', 'error');
+    Message.error('请输入链接');
     return;
   }
 
   if (!validateUrl(inputUrl)) {
-    showMessage(
-      '请输入有效的链接，必须以 http://、https:// 或 #小程序:// 开头',
-      'error'
+    Message.error(
+      '请输入有效的链接，必须以 http://、https:// 或 #小程序:// 开头'
     );
     return;
   }
@@ -93,13 +90,13 @@ async function generateShortLink() {
 
     // 设置当前短链接
     currentShortUrl.value = window.location.origin + data.url;
-    showMessage('短链接生成成功', 'success');
+    Message.success('短链接生成成功');
     urlInput.value = '';
     responseVisible.value = true;
     isError.value = false;
   } catch (error) {
     isLoading.value = false;
-    showMessage(`发生错误: ${error.message || '未知错误'}`, 'error');
+    Message.error(`发生错误: ${error.message || '未知错误'}`);
     currentShortUrl.value = '';
     responseVisible.value = false;
   }
@@ -108,7 +105,7 @@ async function generateShortLink() {
 // 显示二维码模态框
 function showQRCodeModal() {
   if (!currentShortUrl.value) {
-    showMessage('没有可生成二维码的短链接', 'error');
+    Message.error('没有可生成二维码的短链接');
     return;
   }
   qrcodeModalVisible.value = true;
@@ -122,10 +119,10 @@ function closeQRCodeModal() {
 // 显示统计信息
 function showStats() {
   if (!currentShortUrl.value) {
-    showMessage('没有可查看统计的短链接', 'error');
+    Message.error('没有可查看统计的短链接');
     return;
   }
-  showMessage('访问统计功能即将上线', 'info');
+  Message.info('访问统计功能即将上线');
 }
 </script>
 
