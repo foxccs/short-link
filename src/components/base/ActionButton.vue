@@ -1,10 +1,12 @@
 <template>
-  <button 
-    class="action-btn" 
-    :class="[buttonClass, { 'share-animation': animation, 'share-success': success }]" 
+  <button
+    class="action-btn"
+    :class="[
+      buttonClass,
+      { 'share-animation': animation, 'share-success': success },
+    ]"
     @click="emit('click')"
   >
-    <div class="btn-icon" v-html="icon"></div>
     <slot></slot>
   </button>
 </template>
@@ -14,20 +16,20 @@
 defineProps({
   icon: {
     type: String,
-    required: true
+    required: true,
   },
   buttonClass: {
     type: String,
-    default: ''
+    default: '',
   },
   animation: {
     type: Boolean,
-    default: false
+    default: false,
   },
   success: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 const emit = defineEmits(['click']);

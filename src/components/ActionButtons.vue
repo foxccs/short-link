@@ -1,6 +1,7 @@
 <template>
   <div class="action-buttons" v-if="shortUrl">
-    <ActionButton :icon="copyIcon" @click="copyLink">
+    <ActionButton @click="copyLink">
+      <ClipboardCopy size="16" />
       {{ copyBtnText }}
     </ActionButton>
 
@@ -11,22 +12,17 @@
       :success="shareSuccess"
       @click="shareLink"
     >
+      <Share size="16" />
       <span class="share-btn-text">{{ shareBtnText }}</span>
     </ActionButton>
 
-    <ActionButton
-      :icon="qrcodeIcon"
-      buttonClass="qrcode"
-      @click="emit('generate-qrcode')"
-    >
+    <ActionButton buttonClass="qrcode" @click="emit('generate-qrcode')">
+      <QrCode size="16" />
       生成二维码
     </ActionButton>
 
-    <ActionButton
-      :icon="statsIcon"
-      buttonClass="stats"
-      @click="emit('show-stats')"
-    >
+    <ActionButton :icon="statsIcon" @click="emit('show-stats')">
+      <BarChart size="16" />
       访问统计
     </ActionButton>
   </div>
@@ -35,10 +31,8 @@
 <script setup>
 import { ref } from 'vue';
 
-import copyIcon from '@/assets/images/copy.svg?raw';
-import qrcodeIcon from '@/assets/images/qrcode.svg?raw';
-import shareIcon from '@/assets/images/share.svg?raw';
-import statsIcon from '@/assets/images/stats.svg?raw';
+import { BarChart, ClipboardCopy, QrCode, Share } from 'lucide-vue-next';
+
 import { Message } from '@arco-design/web-vue';
 
 import ActionButton from './base/ActionButton.vue';

@@ -1,5 +1,13 @@
+<!--
+ * @Author: zi.yang
+ * @Date: 2025-06-10 00:16:41
+ * @LastEditors: zi.yang
+ * @LastEditTime: 2025-06-10 22:56:17
+ * @Description: 
+ * @FilePath: /short-link/src/components/base/LoadingSpinner.vue
+-->
 <template>
-  <div class="loading" :class="{ active: active }">
+  <div class="loading active" v-if="active">
     <div class="loading-spinner"></div>
     <span><slot>加载中...</slot></span>
   </div>
@@ -10,8 +18,8 @@
 defineProps({
   active: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 </script>
 
