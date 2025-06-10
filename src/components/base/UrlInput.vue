@@ -1,7 +1,9 @@
 <template>
   <div class="url-wrapper">
     <div class="input-container">
-      <div class="input-icon" v-html="icon"></div>
+      <div class="input-icon">
+        <Link size="20" />
+      </div>
       <input 
         type="text" 
         :placeholder="placeholder" 
@@ -18,6 +20,8 @@
 </template>
 
 <script setup>
+import { Link } from 'lucide-vue-next';
+
 // 定义props
 const props = defineProps({
   modelValue: {
@@ -31,11 +35,8 @@ const props = defineProps({
   buttonText: {
     type: String,
     default: '提交'
-  },
-  icon: {
-    type: String,
-    required: true
   }
+  // 移除 icon prop，因为我们直接使用 Lucide 图标
 });
 
 // 定义emits

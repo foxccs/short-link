@@ -5,12 +5,18 @@
       <div class="short-link-value">
         <a :href="shortUrl" target="_blank">{{ shortUrl }}</a>
       </div>
+      <div v-if="expiresAt" class="expiration-info">
+        <div class="expiration-label">有效期至</div>
+        <div class="expiration-value">{{ formatDate(expiresAt) }}</div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
+import { computed } from 'vue';
+
+const props = defineProps({
   shortUrl: {
     type: String,
     default: ''
@@ -22,8 +28,25 @@ defineProps({
   isError: {
     type: Boolean,
     default: false
+  },
+  expiresAt: {
+    type: String,
+    default: null
   }
 });
+
+// 格式化日期
+function formatDate(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
 </script>
 
 <style scoped>
@@ -80,6 +103,24 @@ defineProps({
   gap: 8px;
 }
 
+.expiration-info {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed #e0e0e0;
+}
+
+.expiration-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.expiration-value {
+  font-size: 14px;
+  color: #f39c12;
+  font-weight: 500;
+}
+
 .response.visible {
   display: block;
   animation: fadeIn 0.5s ease;
@@ -100,9 +141,8 @@ defineProps({
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateY(10px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);

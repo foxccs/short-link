@@ -1,10 +1,17 @@
 <template>
   <div class="login-wrapper">
     <div class="login-card">
-      <h1 class="login-title">登录</h1>
-      <p class="login-subtitle">登录以管理您的短链接</p>
+      <h1 class="login-title">{{ isRegisterMode ? '注册' : '登录' }}</h1>
+      <p class="login-subtitle">
+        {{
+          isRegisterMode ? '创建账号以管理您的短链接' : '登录以管理您的短链接'
+        }}
+      </p>
 
-      <form class="login-form" @submit.prevent="handleLogin">
+      <form
+        class="login-form"
+        @submit.prevent="isRegisterMode ? handleRegister : handleLogin"
+      >
         <div class="form-group">
           <label for="username">用户名</label>
           <input
@@ -27,16 +34,52 @@
           />
         </div>
 
+        <div v-if="isRegisterMode" class="form-group">
+          <label for="confirmPassword">确认密码</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            v-model="confirmPassword"
+            placeholder="请再次输入密码"
+            required
+          />
+        </div>
+
         <div class="form-actions">
           <button type="submit" class="login-button" :disabled="isLoading">
             <LoadingSpinner v-if="isLoading" :active="true" />
-            <span v-else>登录</span>
+            <span v-else>{{ isRegisterMode ? '注册' : '登录' }}</span>
           </button>
         </div>
       </form>
 
+      <div class="oauth-options">
+        <p class="oauth-divider">或者使用以下方式</p>
+        <div class="oauth-buttons">
+          <button
+            @click="handleOAuthLogin('github')"
+            class="oauth-button github"
+          >
+            <GitHubIcon size="16" />
+            GitHub
+          </button>
+          <button
+            @click="handleOAuthLogin('wechat')"
+            class="oauth-button wechat"
+          >
+            <WeChatIcon size="16" />
+            微信
+          </button>
+        </div>
+      </div>
+
       <div class="login-footer">
-        <p>还没有账号？ <a href="#" @click.prevent="goToRegister">注册</a></p>
+        <p v-if="isRegisterMode">
+          已有账号？ <a href="#" @click.prevent="toggleMode">登录</a>
+        </p>
+        <p v-else>
+          还没有账号？ <a href="#" @click.prevent="toggleMode">注册</a>
+        </p>
         <p><a href="#" @click.prevent="goToHome">返回首页</a></p>
       </div>
     </div>
@@ -47,17 +90,30 @@
 import { ref } from 'vue';
 
 import { useRouter } from 'vue-router';
+import { GitHubIcon, WeChatIcon } from 'vue3-simple-icons';
 
 import LoadingSpinner from '@/components/base/LoadingSpinner.vue';
+import { getOAuthLoginUrl, login, register } from '@/services/api.js';
 import { Message } from '@arco-design/web-vue';
 
 // 响应式状态
 const username = ref('');
 const password = ref('');
+const confirmPassword = ref('');
 const isLoading = ref(false);
+const isRegisterMode = ref(false);
 
 // 路由
 const router = useRouter();
+
+// 切换登录/注册模式
+function toggleMode() {
+  isRegisterMode.value = !isRegisterMode.value;
+  // 清空表单
+  username.value = '';
+  password.value = '';
+  confirmPassword.value = '';
+}
 
 // 处理登录
 async function handleLogin() {
@@ -69,35 +125,65 @@ async function handleLogin() {
   isLoading.value = true;
 
   try {
-    // 这里将来会实现实际的登录逻辑
-    // const response = await login(username.value, password.value);
+    // 调用登录API
+    await login(username.value, password.value);
 
-    // 模拟登录延迟
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    Message.info('登录功能即将上线');
+    Message.success('登录成功');
     isLoading.value = false;
 
     // 登录成功后重定向到统计面板
-    // router.push('/dashboard');
+    router.push('/dashboard');
   } catch (error) {
     isLoading.value = false;
     Message.error(error.message || '登录失败，请稍后再试');
   }
 }
 
-// 跳转到注册页面
-function goToRegister() {
-  Message.info('注册功能即将上线');
-  // 将来会实现注册页面跳转
-  // router.push('/register');
+// 处理注册
+async function handleRegister() {
+  if (!username.value || !password.value) {
+    Message.error('请输入用户名和密码');
+    return;
+  }
+
+  if (password.value !== confirmPassword.value) {
+    Message.error('两次输入的密码不一致');
+    return;
+  }
+
+  isLoading.value = true;
+
+  try {
+    // 调用注册API
+    await register(username.value, password.value);
+
+    Message.success('注册成功，请登录');
+    isLoading.value = false;
+
+    // 切换到登录模式
+    isRegisterMode.value = false;
+  } catch (error) {
+    isLoading.value = false;
+    Message.error(error.message || '注册失败，请稍后再试');
+  }
+}
+
+// 处理OAuth登录
+async function handleOAuthLogin(provider) {
+  try {
+    // 获取OAuth登录URL
+    const response = await getOAuthLoginUrl(provider);
+
+    // 重定向到OAuth提供商的授权页面
+    window.location.href = response.url;
+  } catch (error) {
+    Message.error(`${provider}登录失败: ${error.message || '未知错误'}`);
+  }
 }
 
 // 跳转到首页
 function goToHome() {
-  // 将来会实现首页跳转
-  // router.push('/');
-  window.location.href = '/';
+  router.push('/');
 }
 </script>
 
@@ -209,6 +295,86 @@ function goToHome() {
 .login-button:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* OAuth 登录部分 */
+.oauth-options {
+  margin-top: 30px;
+}
+
+.oauth-divider {
+  position: relative;
+  text-align: center;
+  margin: 20px 0;
+  color: #636e72;
+  font-size: 14px;
+}
+
+.oauth-divider::before,
+.oauth-divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 35%;
+  height: 1px;
+  background-color: #e0e0e0;
+}
+
+.oauth-divider::before {
+  left: 0;
+}
+
+.oauth-divider::after {
+  right: 0;
+}
+
+.oauth-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.oauth-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  color: #fff;
+  width: 120px;
+}
+
+.oauth-button svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.oauth-button.github {
+  background-color: #24292e;
+}
+
+.oauth-button.github:hover {
+  background-color: #1a1e22;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.oauth-button.wechat {
+  background-color: #07c160;
+}
+
+.oauth-button.wechat:hover {
+  background-color: #06ad56;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(7, 193, 96, 0.3);
 }
 
 .login-footer {
