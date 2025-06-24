@@ -2,10 +2,10 @@
   <div class="home-container">
     <div class="wrapper">
       <a
-        href="https://github.com/Alessandro-Pang/short-link"
+        href="https://www.foxccs.cn"
         class="github-link"
         target="_blank"
-        ><span v-html="githubIcon"></span> GitHub
+        ><span v-html="githubIcon"></span> 狐狸导航
       </a>
       <header>短链接服务</header>
 
